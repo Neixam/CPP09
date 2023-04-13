@@ -10,8 +10,21 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "RPN.hpp"
+#include <iostream>
 
 int main(int ac, char **av)
 {
+    RPN rpn;
 
+    for (int i = 1; i < ac; i++)
+        rpn.addInput(av[i]);
+    try
+    {
+        std::cout << rpn.result() << std::endl;
+    } catch (std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+    return (0);
 }

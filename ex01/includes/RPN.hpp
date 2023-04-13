@@ -12,7 +12,7 @@
 
 #ifndef RPN_HPP
 #define RPN_HPP
-#include <queue>
+#include <stack>
 #include <string>
 
 class RPN
@@ -34,13 +34,19 @@ public:
     public:
         virtual const char* what() const throw();
     };
-    void     add();
-    void     sub();
-    void     div();
-    void     mul();
+    class   NotValidInput : public std::exception
+    {
+    public:
+        virtual const char* what() const throw();
+    };
 private:
     int     remove();
-    std::queue<int> _terms;
+    int     doOp(const std::string& token);
+    int     add();
+    int     sub();
+    int     div();
+    int     mul();
+    std::stack<int> _terms;
     std::string     _input;
 };
 

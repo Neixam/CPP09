@@ -13,6 +13,8 @@
 #include <cstdlib>
 #include <climits>
 #include <stdexcept>
+#include <iostream>
+#include <sstream>
 #include "RPN.hpp"
 
 RPN::RPN() : _input("")
@@ -46,35 +48,33 @@ bool    isInt(const std::string& value)
     return ret;
 }
 
-void    doOp(RPN& rpn, const std::string& token)
+int RPN::doOp(const std::string& token)
 {
     static const struct
     {
-        void        (RPN::*handler)();
+        int         (RPN::*handler)();
         std::string token;
     } operator_handle[4] =
             {
                     { &RPN::add, "+" },
                     { &RPN::sub, "-" },
-                    { &RPN::div, "*" },
-                    { &RPN::mul, "/" }
+                    { &RPN::div, "/" },
+                    { &RPN::mul, "*" }
             };
 
     for (int i = 0; i < 4; ++i)
-    {
         if (operator_handle[i].token == token)
-        {
-            (rpn.*operator_handle[i].handler)();
-            return;
-        }
-    }
+            return (this->*operator_handle[i].handler)();
+    throw NotValidInput();
 }
 
 int RPN::result()
 {
-    for (size_t pos = _input.find(' '); pos != std::string::npos; pos = _input.find(' '))
+    std::stringstream   ss(_input);
+    std::string         token;
+
+    while (ss >> token)
     {
-        std::string token = _input.substr(0, pos);
         if (isInt(token))
         {
             long val = std::strtol(token.c_str(), NULL, 10);
@@ -84,55 +84,60 @@ int RPN::result()
             _terms.push(intVal);
         }
         else
-            doOp(*this, token);
-        _input.erase(0, pos + 1);
+            _terms.push(doOp(token));
     }
+    _input = "";
     if (_terms.size() == 1)
         return remove();
-    return _terms.front();
+    return _terms.top();
 }
 
 void RPN::addInput(const std::string &input)
 {
-    _input += input.empty() ? input : "" + input;
+    _input += _input.empty() ? input : " " + input;
 }
 
-void RPN::add()
+int RPN::add()
 {
     if (_terms.size() < 2)
         throw NotEnoughNumbers();
-    _terms.front() = remove() + _terms.front();
+    return remove() + remove();
 }
 
-void RPN::sub()
-{
-    if (_terms.size() < 2)
-        throw NotEnoughNumbers();
-    _terms.front() = remove() - _terms.front();
-}
-
-void RPN::div()
+int RPN::sub()
 {
     int a;
 
     if (_terms.size() < 2)
         throw NotEnoughNumbers();
     a = remove();
-    if (_terms.front() == 0)
-        throw DivideByZero();
-    _terms.front() = a / _terms.front();
+    return remove() - a;
 }
 
-void RPN::mul()
+int RPN::div()
+{
+    int a;
+    int b;
+
+    if (_terms.size() < 2)
+        throw NotEnoughNumbers();
+    a = remove();
+    b = remove();
+    if (a == 0)
+        throw DivideByZero();
+    return b / a;
+}
+
+int RPN::mul()
 {
     if (_terms.size() < 2)
         throw NotEnoughNumbers();
-    _terms.front() = remove() * _terms.front();
+    return remove() * remove();
 }
 
 int RPN::remove()
 {
-    int ret = _terms.front();
+    int ret = _terms.top();
     _terms.pop();
     return ret;
 }
@@ -145,4 +150,9 @@ const char *RPN::NotEnoughNumbers::what() const throw()
 const char *RPN::DivideByZero::what() const throw()
 {
     return "Error: you tried to divide by 0.";
+}
+
+const char *RPN::NotValidInput::what() const throw()
+{
+    return "Error: not a valid input.";
 }
