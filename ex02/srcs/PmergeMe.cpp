@@ -90,7 +90,7 @@ void    print(const It& begin, const It& end)
     int i = 1;
     It it = begin;
 
-    for (; it != end - 1 && i < MAX_SIZE_PRINT; it++, i++)
+    for (; it != end - 1 && i != MAX_SIZE_PRINT; it++, i++)
         std::cout << *it << " ";
     std::cout << *(it++);
     if (i == MAX_SIZE_PRINT && it != end)
