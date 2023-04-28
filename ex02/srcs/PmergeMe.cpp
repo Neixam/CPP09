@@ -64,6 +64,8 @@ PmergeMe::PmergeMe(int ac, char **args)
             long value = std::strtol(token.c_str(), NULL, 10);
             if (value > INT_MAX || value <= 0)
                 throw BadInput();
+            if (std::find(_baseElements.begin(), _baseElements.end(), static_cast<int>(value)) != _baseElements.end())
+                throw BadInput();
             _baseElements.push_back(static_cast<int>(value));
             _vecNumbers.push_back(static_cast<int>(value));
             _deqNumbers.push_back(static_cast<int>(value));
