@@ -82,14 +82,16 @@ std::ostream& operator<<(std::ostream& os, const std::pair<int, int>& pair)
     return os << "(" << pair.first << ", " << pair.second << ")";
 }
 
-template<typename T>
-void    print(const T& tab)
+template<typename It>
+void    print(const It& begin, const It& end)
 {
-    typename T::const_iterator it = tab.end() - 1;
-    for (int i = MAX_SIZE_PRINT; it != tab.begin() && i != 0; it--, i--)
+    int i = 1;
+    It it = begin;
+
+    for (; it != end - 1 && i < MAX_SIZE_PRINT; it++, i++)
         std::cout << *it << " ";
-    std::cout << *it;
-    if (MAX_SIZE_PRINT != -1 && tab.size() > (unsigned int)MAX_SIZE_PRINT)
+    std::cout << *(it++);
+    if (i == MAX_SIZE_PRINT && it != end)
         std::cout << " [...]";
     std::cout << std::endl;
 }
@@ -183,12 +185,12 @@ size_t PmergeMe::nbElements() const
 
 void PmergeMe::elems() const
 {
-    print(_baseElements);
+    print(_baseElements.begin(), _baseElements.end());
 }
 
 void PmergeMe::result() const
 {
-    print(_vecNumbers);
+    print(_vecNumbers.rbegin(), _vecNumbers.rend());
 }
 
 const char *PmergeMe::BadInput::what() const throw()
