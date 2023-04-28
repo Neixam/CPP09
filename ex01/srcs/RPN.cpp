@@ -70,6 +70,8 @@ int RPN::doOp(const std::string& token)
 
 int RPN::result()
 {
+    if (_input.empty())
+        throw std::invalid_argument("Error: empty");
     std::stringstream   ss(_input);
     std::string         token;
 
@@ -78,8 +80,8 @@ int RPN::result()
         if (isInt(token))
         {
             long val = std::strtol(token.c_str(), NULL, 10);
-            if (val < INT_MIN || val > INT_MAX)
-                throw std::invalid_argument("overflow");
+            if (val < 0 || val > 9)
+                throw std::invalid_argument("Error: overflow");
             int intVal = static_cast<int>(val);
             _terms.push(intVal);
         }
@@ -87,8 +89,6 @@ int RPN::result()
             _terms.push(doOp(token));
     }
     _input = "";
-    if (_terms.size() == 1)
-        return remove();
     return _terms.top();
 }
 
