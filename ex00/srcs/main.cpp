@@ -20,8 +20,14 @@ int main(int ac, char **av)
         std::cout << "usage:\n./btc input_file.txt" << std::endl;
         return 0;
     }
-    BitcoinExchange btc;
+    try
+    {
+        BitcoinExchange btc;
 
-    btc.parseInput(av[1]);
+        btc.parseInput(av[1]);
+    } catch (std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
     return 0;
 }

@@ -13,7 +13,6 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
-#include <climits>
 #include <iostream>
 #include "BitcoinExchange.hpp"
 
@@ -30,7 +29,7 @@ int countColumn(const std::string& firstLine, char delim)
 
 BitcoinExchange::BitcoinExchange()
 {
-	std::ifstream	ifs("resources/data.csv");
+	std::ifstream	ifs("data.csv");
 	std::string 	buf;
 
 	if (!ifs || !std::getline(ifs, buf) || countColumn(buf, ',') != 2)
@@ -146,9 +145,7 @@ double BitcoinExchange::getNewValue(const std::string &date, double value)
 {
     iterData it = _dataBase.lower_bound(date);
 
-    if (it == _dataBase.end())
-        throw NoGoodInputFile("too recent date");
-    if (it->first == date)
+    if (it != _dataBase.end() && it->first == date)
         return it->second * value;
     if (it == _dataBase.begin())
         throw NoGoodInputFile("too ancient date");
